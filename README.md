@@ -13,4 +13,4 @@ _This code serves as a reference._
 
   **prelim_code**; we recommend this code for most uses. overview_code provides a more bare bones, but easily interpreted version of a Spur Gear analysis. However, this code is translated from the textbook analysis equations. Much of it can be removed upon proceeding with the project, and the necessary assumptions are determined.
   
-_This code serves as the main code **(use this)**_
+_This code serves as the main body of code._
