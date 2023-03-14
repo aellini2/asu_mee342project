@@ -3,6 +3,7 @@ Mechanical Design Project
 
 - Created Code for Gear Design [MATLAB]
 - Please see files for code breakdown; all code is annotated to explain the process and variables used/defined
+- **For further explaination of different input variables, please refer to Chapter 14 of Shigley's Design Textbook. definitions, equations, tables, and factors can be found there.**
 
 There are two code files provided in this repository:
 
