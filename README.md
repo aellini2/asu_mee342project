@@ -9,8 +9,8 @@ There are two code files provided in this repository:
 
   **background_code**; provides a detailed code that was created through a combination of those found in other repositories, ChatGPT and our own edits. The general code was in many ways based off this. Though this code requires many necessary assumptions in order to run; many of which are completely unnecessary for the scope of this project. 
   
-_This code serves as a reference._
+    _This code serves as a reference._
 
   **prelim_code**; we recommend this code for most uses. overview_code provides a more bare bones, but easily interpreted version of a Spur Gear analysis. However, this code is translated from the textbook analysis equations. Much of it can be removed upon proceeding with the project, and the necessary assumptions are determined.
   
-_This code serves as the main code **(use this)**_
+    _This code serves as the main code **(use this)**_
