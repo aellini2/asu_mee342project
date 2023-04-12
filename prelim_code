@@ -2,16 +2,18 @@
 % MEE Gearbox Preliminary Report
 % prelim_code
 
-% note: MATLAB code
+% note: 
+% This is a MATLAB code file.
+% Code was generated in English units (in, lbf, etc.)
 
 %% Definition and Variables
 % General & Miscellaneous
     d = ;       % operating pitch diameter
-    n = ;       % speed
+    n = ;       % gear speed (rev/min)
     H = ;       % power
     Np = ;      % number of teeth on pinion
     Pd = ;      % diametral pitch
-    F = ;       % net face width (narrowest member) 
+    F = ;       % net face width (narrowest member)
     J = ;       % geometry factor (bending stress)
     I = ;       % geometry factor (pitting/wear resistance)
 % [S] Safety Factors and Strengths
@@ -42,9 +44,15 @@
 
 %% Bending Calculations 
 % Preliminary
+
 dp = Np/Pd;         % pitch diameter
-V = pi*d*n/12;
-Wt = 33000*H/V;     % transmitted load
+gd = ;              % gear diameter
+T = d/2 * Wt    % torque
+    V = pi*d*n/12;  % pitch-line velocity (ft/min)
+    n = ;           % gear speed (rev/min)
+    H = ;           % power (hp OR  kW)
+Wt = 33000*H/V;         % transmitted load (lbf)
+Wt = 60000*H/(pi*gd*n)  % transmitted load (kN)
 
 % Bending General Equations
 bendStress = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J)   % bending stress
