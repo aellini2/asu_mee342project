@@ -63,4 +63,3 @@ wearStress = Cp*(Wt*Ko*Kv*Ks*Km*Cf/(dp*F*I)   % wear/contact stress
 wearFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)           % wear fatigue/endurance strength
 bendFS = ((Sc*Zn*Ch)/(Kt*Kr))/wearStress       % bending factor of safety
 
-
