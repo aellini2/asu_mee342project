@@ -3,13 +3,6 @@
 % gear_code_2.0
 % Andre Ellini, Marisa Mannon, Hardy Duong
 
-% note: 
-% This is a MATLAB code file.
-% Code was generated in English units (in, lbf, etc.)
-% Code is to be used for design of a spur gear with the given parameters.
-
-% Input all values denoted with a "p" with PINION Values
-% all imputs that do not specify _p, treat as values for larger gear.
 
 %% Definition and Variables
 % Diametral Pitch and Face Width
