@@ -312,7 +312,7 @@ bendFS = ((St*Yn)/(Kt*Kr))/bendStressG       % bending factor of safety
 contFS = (Sc*Zn*Ch)/(Kt*Kr*contStressG);     % contact factor of safety (wear)
 
 bendFatigue = (St*Yn)/(bendFS*Kt*Kr)             % bending fatigue/endurance strength
-contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)             % bending fatigue/endurance strength
+contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)              % contact fatigue/endurance strength (wear)
 
 weightG = density*Vol_g;
 
@@ -325,7 +325,7 @@ bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressG             % bending factor of safety
 contFS_p = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*contStressP); % contact factor of safety (wear)
 
 bendFatigue = (St*Yn)/(Sf*Kt*Kr)                % bending fatigue/endurance strength
-contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)             % bending fatigue/endurance strength
+contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)             % contact fatigue/endurance strength (wear)
 
 weightP = density*Vol_p;
 
