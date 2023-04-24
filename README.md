@@ -1,5 +1,5 @@
-# asu_mee342project
-Mechanical Design Project
+# ASU MEE 342 
+# Turbine Gearbox Design Project
 
 - Created Code for Gear Design [MATLAB]
 - Please see files for code breakdown; all code is annotated to explain the process and variables used/defined
