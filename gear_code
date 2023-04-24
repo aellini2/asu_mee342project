@@ -56,7 +56,7 @@
   % for a summary, Ch = 1 for pinion ALWAYS.  
     % first find Hb (gear) and Hb_p (pinion), next refer to ratio on table or eqn on previous page.
     % Ratio Hbp/Hbg = Ch. Please ensure pinion is harder than
-  Hb_p            % enter gear hardness
+  Hb_p ;          % enter pinion hardness
   Hb_g ;          % enter gear hardness
   Ch = Hb_p/Hb_g;
     if Ch < 1
@@ -64,7 +64,7 @@
     ifelse Ch > 1.7
       error('invalid brinell hardness')
     end
-  Ch_p = 1;
+  Ch = 1;         % delete this line if gears are different materials
   
   
 % Additional Assumptions
@@ -290,6 +290,16 @@ end
       error('invalid material selection')
     end
    
+  % Cycle Factors
+  Ncycles = H*(60)*(24)*(365)*(10);
+  
+    % Stress Factor (bending)
+  Yn = 1.3558*Num_Cycles^(-0.0178);
+  
+    % Stress Factor (pitting)
+  Zn = 1.4488*Num_Cycles^(-0.0178);
+  
+%% Governing Equations
   
   
   
