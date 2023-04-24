@@ -33,11 +33,11 @@
   Ko = ;        % overload factor, obtain from Shigley Tables
 
 % Quality
-  Qual = ;      % quality number (1-6, with 6 being the highest)
+  qual = ;      % quality number (1-6, with 6 being the highest)
   nd = ;        % design factor
   
 % Teeth Systems
-  phi = ;       % pressure angle
+  phi = ;       % pressure angle, see shigley for derivation
   N = ;         % Number of teeth on gear
   N_p = ;       % Number of teeth on pinion
   rf = ;        % fillet radius (inches)
@@ -49,7 +49,7 @@
 % Geometry Factors
   J = ;          % see Shigley table 14-6
   J_p = ;        % see Shigley table 14-6
-  I = ((cosd(phi_n)*sind(phi_n))/(2))*(m_g/(m_g+1)); % Geometry Factor
+  I = ((cosd(phi)*sind(phi))/(2))*(mg/(mg+1)); % Geometry Factor
  
 % Brinell Hardness
   % please view section in Shigley; figure 14.12
@@ -66,9 +66,6 @@
     end
   Ch = 1;         % delete this line if gears are different materials
   
-  
-% Additional Assumptions
-  Cf = 1;         % assumed Surface Condition Factor
 
 %% Preliminary Calculations and Equations
 
@@ -99,10 +96,9 @@
   % Transmitted Load
   Wt = 33000*H/V;         % transmitted load (lbf)
   
-  % Lewis Form Factor
-    % credit to morlando12 for the idea of importing this table into MATLAB
-    % and for the next few dozen lines of code.
-    N_g = N
+%%% Lewis Form Factor
+    % credit to morlando12 for the idea of importing this table into MATLAB and for the next 100 lines of code.
+    N_g = N;
   LewisFormFactorMatrix = [12 0.245;13 0.261;14 0.277;15 0.29;16 0.296;17 0.303;18 0.309;19 0.314;20 0.322;21 0.328;22 0.331;24 0.337;26 0.346;28 0.353;30 0.359;34 0.371;38 0.384;43 0.397;50 0.409;60 0.422;75 0.435;100 0.447;150 0.46;300 0.472;400 0.480]; % Table of lewis form factors. Table 14-2 from book
 
 % Statements for Pinion Lewis Form Factor:
@@ -216,15 +212,19 @@ else
     error('invalid Lewis Form Factor selection')
 end
 
+%%% More Factors, Constants, and Variables
+
   % Size Factor
-  K_sp = 1.192*((F/Pd)*(Y_p)^(1/2))^(0.0535);  % Size factor for pinion
-  K_sg = 1.192*((F/Pd)*(Y_g)^(1/2))^(0.0535);  % Size factor for gear
+  Ks_p = 1.192*((F/Pd)*(Y_p)^(1/2))^(0.0535);  % Size factor for pinion
+  Ks = 1.192*((F/Pd)*(Y_g)^(1/2))^(0.0535);  % Size factor for gear
   
-%% Load Distribution Factors
+  % Load Distribution Factors
   
   Cc = ;    % load correction factor--- uncrowned = 1, crowned = 0.8
   
-  % Pinion Proportion Factor and Modifier
+  % Proportion Factor and Modifier
+    Cf = 1;         % assumed Surface Condition Factor of gear
+    
   if F <= 1
     Cf_p = ((F/(10*d_p))-0.025);
   elseif (1<F)&&(F<=17)
@@ -304,33 +304,32 @@ end
 % Gear (Larger)
 
 bendStressG = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J)   % bending stress
-contStressG = (Cp)*((Wt)*(Ko)*(Kv)*(Ksg)*((Km)*(Cf))/((dp)*(F)*(I))); % contact stress
+contStressG = (Cp)*((Wt)*(Ko)*(Kv)*(Ks)*((Km)*(Cf))/((dp)*(F)*(I))); % contact stress
 
 bendFS = ((St*Yn)/(Kt*Kr))/bendStressG       % bending factor of safety
-contFS = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*ContactStressGear); % Safety Factor for Contact Stress for gear
+contFS = (Sc*Zn*Ch)/(Kt*Kr*contStressG);     % contact factor of safety (wear)
 
-  % bendFatigue = (St*Yn)/(Sf*Kt*Kr)             % bending fatigue/endurance strength
+bendFatigue = (St*Yn)/(bendFS*Kt*Kr)             % bending fatigue/endurance strength
+contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)             % bending fatigue/endurance strength
 
 weightG = density*Vol_g;
 
 % Pinion (Smaller)
 
-bendStressP = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J)   % bending stress
-contStressP = (Cp)*((Wt)*(Ko)*(Kv)*(Ksg)*((Km)*(Cf))/((dp)*(F)*(I)));   % contact stress
+bendStressP = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J_p)  % bending stress
+contStressP = (Cp)*((Wt)*(Ko)*(Kv)*(Ks_p)*((Km)*(Cf_p))/((dp)*(F)*(I)));   % contact stress
 
-bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressG       % bending factor of safety
-contFS_p = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*contStressP); % Safety Factor for Contact Stress for pinion
+bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressG             % bending factor of safety
+contFS_p = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*contStressP); % contact factor of safety (wear)
 
-  % bendFatigue = (St*Yn)/(Sf*Kt*Kr)             % bending fatigue/endurance strength
+bendFatigue = (St*Yn)/(Sf*Kt*Kr)                % bending fatigue/endurance strength
+contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)             % bending fatigue/endurance strength
 
-weightP = density*Vol_g;
+weightP = density*Vol_p;
 
 % Print Results
     disp('Gear Bending FS:', bendFS)
     disp('Gear Contact FS:', contFS)
-    disp(' ')
     disp('Pinion Bending FS:', bendFS_p)
     disp('Pinion Cont FS:', contFS_p)
-
-
    
