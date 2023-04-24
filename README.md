@@ -1,4 +1,4 @@
-# Turbine Gearbox Design Project for mee342_asu
+# Turbine Gear/Pinion Design Code for mee342_asu
 
 - Created Code for Gear Design [MATLAB]
 - Please see files for code breakdown; all code is annotated to explain the process and variables used/defined
