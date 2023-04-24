@@ -300,8 +300,37 @@ end
   Zn = 1.4488*Num_Cycles^(-0.0178);
   
 %% Governing Equations
-  
-  
-  
-  
-  
+
+% Gear (Larger)
+
+bendStressG = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J)   % bending stress
+contStressG = (Cp)*((Wt)*(Ko)*(Kv)*(Ksg)*((Km)*(Cf))/((dp)*(F)*(I))); % contact stress
+
+bendFS = ((St*Yn)/(Kt*Kr))/bendStressG       % bending factor of safety
+contFS = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*ContactStressGear); % Safety Factor for Contact Stress for gear
+
+  % bendFatigue = (St*Yn)/(Sf*Kt*Kr)             % bending fatigue/endurance strength
+
+weightG = density*Vol_g;
+
+% Pinion (Smaller)
+
+bendStressP = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J)   % bending stress
+contStressP = (Cp)*((Wt)*(Ko)*(Kv)*(Ksg)*((Km)*(Cf))/((dp)*(F)*(I)));   % contact stress
+
+bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressG       % bending factor of safety
+contFS_p = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*contStressP); % Safety Factor for Contact Stress for pinion
+
+  % bendFatigue = (St*Yn)/(Sf*Kt*Kr)             % bending fatigue/endurance strength
+
+weightP = density*Vol_g;
+
+% Print Results
+    disp('Gear Bending FS:', bendFS)
+    disp('Gear Contact FS:', contFS)
+    disp(' ')
+    disp('Pinion Bending FS:', bendFS_p)
+    disp('Pinion Cont FS:', contFS_p)
+
+
+   
