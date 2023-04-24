@@ -1,0 +1,200 @@
+%%% Gear Design Project Code
+% MEE Gearbox Preliminary Report
+% gear_code_2.0
+
+% note: 
+% This is a MATLAB code file.
+% Code was generated in English units (in, lbf, etc.)
+% Code is to be used for design of a spur gear with the given parameters.
+
+% Input all values denoted with a "p" with PINION Values
+% all imputs that do not specify _p, treat as values for larger gear.
+
+%% Definition and Variables
+% Diametral Pitch and Face Width
+  % face width must be between 3pi/Pd and 5pi/Pd
+  % recommended F of 4pi/Pd used below.
+  Pd = ;              % diametral pitch
+  F = 4*pi/Pd;        % net face width (narrowest member)
+
+% Gear Material
+  % this is to be predetermined; any edits to material require code to be changed.
+  nu = ;        % poisson's ratio
+  E = ;         % elastic modulus (ksi)
+  density = ;   % density (lb/ft^3)
+  
+% Loads and Forces
+  rpm = ;       % revolutions per minute
+  H = ;         % power (hp)
+  R = 0.9;      % reliability factor (est 0.9)
+  Ko = ;        % overload factor, obtain from Shigley Tables
+
+% Quality
+  Qual = ;      % quality number (1-6, with 6 being the highest)
+  nd = ;        % design factor
+  
+% Teeth Systems
+  phi = ;       % pressure angle
+  N = ;         % Number of teeth on gear
+  N_p = ;       % Number of teeth on pinion
+  rf = ;        % fillet radius (inches)
+
+
+%% Preliminary Calculations and Equations
+
+  % pinion dimensions
+  dp = N_p/Pd;        % inches
+  d_ref_p = Pd*N_p/12;  % reference circle diameter in feet
+  vol_p = (d_ref_p^2)*(pi/4)*(F/12);    % used for weight/cost calculation
+  
+  % gear dimensions
+  dg = N/Pd;          % inches
+  d_ref = Pd*N_p/12;  % reference circle diameter in feet
+  vol_g = (d_ref^2)*(pi/4)*(F/12);      % used for weight/cost calculation
+
+% Factors and Such
+  
+  % Dynamic Factor Pinion
+  V = pi*d_p*N_p/12;  % pitch line velocity
+  B = 0.25*(12-qual)^(2/3);
+  A = 50+56*(1-B);
+  Kv = ((A+(V_t)^(1/2))/A)^(B);  % dynamic factor
+  
+  % Size Factor
+  ade = 1/P_d;        % addendum
+  ded = 1.25/P_d;    % dedendum 
+  t = 1.2*(ade+ded); % assuming m_b to be 1.2
+  l = (ade + ded); % height of tooth  
+  
+  % Transmitted Load
+  Wt = 33000*H/V;         % transmitted load (lbf)
+  
+  % Lewis Form Factor
+    % credit to morlando12 for the idea of importing this table into MATLAB
+    % and for the next few dozen lines of code.
+    N_g = N
+  LewisFormFactorMatrix = [12 0.245;13 0.261;14 0.277;15 0.29;16 0.296;17 0.303;18 0.309;19 0.314;20 0.322;21 0.328;22 0.331;24 0.337;26 0.346;28 0.353;30 0.359;34 0.371;38 0.384;43 0.397;50 0.409;60 0.422;75 0.435;100 0.447;150 0.46;300 0.472;400 0.480]; % Table of lewis form factors. Table 14-2 from book
+
+% Statements for Pinion Lewis Form Factor:
+if N_p == 12
+    Y_p = LewisFormFactorMatrix(1,2);
+elseif N_p == 13
+    Y_p = LewisFormFactorMatrix(2,2);
+elseif N_p == 14
+    Y_p = LewisFormFactorMatrix(3,2);
+elseif N_p == 15
+    Y_p = LewisFormFactorMatrix(4,2);
+elseif N_p == 16
+    Y_p = LewisFormFactorMatrix(5,2);
+elseif N_p == 17
+    Y_p = LewisFormFactorMatrix(6,2);
+elseif N_p == 18
+    Y_p = LewisFormFactorMatrix(7,2);
+elseif N_p == 19
+    Y_p = LewisFormFactorMatrix(8,2);
+elseif N_p == 20
+    Y_p = LewisFormFactorMatrix(9,2);
+elseif N_p == 21
+    Y_p = LewisFormFactorMatrix(10,2);
+elseif N_p == 22
+    Y_p = LewisFormFactorMatrix(11,2);
+elseif N_p == 24
+    Y_p = LewisFormFactorMatrix(12,2);
+elseif N_p == 26
+    Y_p = LewisFormFactorMatrix(13,2);
+elseif N_p == 28
+    Y_p = LewisFormFactorMatrix(14,2);
+elseif N_p == 30
+    Y_p = LewisFormFactorMatrix(15,2);
+elseif N_p == 34
+    Y_p = LewisFormFactorMatrix(16,2);
+elseif N_p == 38
+    Y_p = LewisFormFactorMatrix(17,2);
+elseif N_p == 43
+    Y_p = LewisFormFactorMatrix(18,2);
+elseif N_p == 50
+    Y_p = LewisFormFactorMatrix(19,2);
+elseif N_p == 60
+    Y_p = LewisFormFactorMatrix(20,2);
+elseif N_p == 75
+    Y_p = LewisFormFactorMatrix(21,2);
+elseif N_p == 100
+    Y_p = LewisFormFactorMatrix(22,2);
+elseif N_p == 150
+    Y_p = LewisFormFactorMatrix(23,2);
+elseif N_p == 300
+    Y_p = LewisFormFactorMatrix(24,2);
+elseif N_p == 400
+    Y_p = LewisFormFactorMatrix(25,2);
+else
+    error('invalid Lewis Form Factor selection')
+end
+
+% Statements for Gear Lewis Form Factor:
+
+if N_g == 12
+    Y_g = LewisFormFactorMatrix(1,2);
+elseif N_g == 13
+    Y_g = LewisFormFactorMatrix(2,2);
+elseif N_g == 14
+    Y_g = LewisFormFactorMatrix(3,2);
+elseif N_g == 15
+    Y_g = LewisFormFactorMatrix(4,2);
+elseif N_g == 16
+    Y_g = LewisFormFactorMatrix(5,2);
+elseif N_g == 17
+    Y_g = LewisFormFactorMatrix(6,2);
+elseif N_g == 18
+    Y_g = LewisFormFactorMatrix(7,2);
+elseif N_g == 19
+    Y_g = LewisFormFactorMatrix(8,2);
+elseif N_g == 20
+    Y_g = LewisFormFactorMatrix(9,2);
+elseif N_g == 21
+    Y_g = LewisFormFactorMatrix(10,2);
+elseif N_g == 22
+    Y_g = LewisFormFactorMatrix(11,2);
+elseif N_g == 24
+    Y_g = LewisFormFactorMatrix(12,2);
+elseif N_g == 26
+    Y_g = LewisFormFactorMatrix(13,2);
+elseif N_g == 28
+    Y_g = LewisFormFactorMatrix(14,2);
+elseif N_g == 30
+    Y_g = LewisFormFactorMatrix(15,2);
+elseif N_g == 34
+    Y_g = LewisFormFactorMatrix(16,2);
+elseif N_g == 38
+    Y_g = LewisFormFactorMatrix(17,2);
+elseif N_g == 43
+    Y_g = LewisFormFactorMatrix(18,2);
+elseif N_g == 50
+    Y_g = LewisFormFactorMatrix(19,2);
+elseif N_g == 60
+    Y_g = LewisFormFactorMatrix(20,2);
+elseif N_g == 75
+    Y_g = LewisFormFactorMatrix(21,2);
+elseif N_g == 100
+    Y_g = LewisFormFactorMatrix(22,2);
+elseif N_g == 150
+    Y_g = LewisFormFactorMatrix(23,2);
+elseif N_g == 300
+    Y_g = LewisFormFactorMatrix(24,2);
+elseif N_g == 400
+    Y_g = LewisFormFactorMatrix(25,2);
+else
+    error('invalid Lewis Form Factor selection')
+end
+
+  % Size Factor
+  K_sp = 1.192*((F/Pd)*(Y_p)^(1/2))^(0.0535);  % Size factor for pinion
+  K_sg = 1.192*((F/Pd)*(Y_g)^(1/2))^(0.0535);  % Size factor for gear
+  
+  % Load Distribution Factor
+  
+  Kc = ;    % load correction factor--- uncrowned = 1, crowned = 0.8
+  
+  % Pinion Proportion Factor
+  %%%
+  %%%
+  %%%
