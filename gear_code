@@ -23,7 +23,9 @@
   nu = ;        % poisson's ratio
   E = ;         % elastic modulus (ksi)
   density = ;   % density (lb/ft^3)
-  
+  mat = ;       % set this to either 1 or 2.
+    % 1 = grade 1 through-hardened steel, 2 = grade 2 hardened steel
+    % if a different material is chosen, must change Brinell Hardness eqn and Strength eqns
 % Loads and Forces
   rpm = ;       % revolutions per minute
   H = ;         % power (hp)
@@ -40,6 +42,33 @@
   N_p = ;       % Number of teeth on pinion
   rf = ;        % fillet radius (inches)
 
+% Pinion Geometry
+  s1 = ;        % distance between midway and gear
+  s2 = ;        % total distance between centerline of bearing (See Shigley for figure)
+
+% Geometry Factors
+  J = ;          % see Shigley table 14-6
+  J_p = ;        % see Shigley table 14-6
+  I = ((cosd(phi_n)*sind(phi_n))/(2))*(m_g/(m_g+1)); % Geometry Factor
+ 
+% Brinell Hardness
+  % please view section in Shigley; figure 14.12
+  % for a summary, Ch = 1 for pinion ALWAYS.  
+    % first find Hb (gear) and Hb_p (pinion), next refer to ratio on table or eqn on previous page.
+    % Ratio Hbp/Hbg = Ch. Please ensure pinion is harder than
+  Hb_p            % enter gear hardness
+  Hb_g ;          % enter gear hardness
+  Ch = Hb_p/Hb_g;
+    if Ch < 1
+      error('invalid brinell hardness')
+    ifelse Ch > 1.7
+      error('invalid brinell hardness')
+    end
+  Ch_p = 1;
+  
+  
+% Additional Assumptions
+  Cf = 1;         % assumed Surface Condition Factor
 
 %% Preliminary Calculations and Equations
 
@@ -191,11 +220,78 @@ end
   K_sp = 1.192*((F/Pd)*(Y_p)^(1/2))^(0.0535);  % Size factor for pinion
   K_sg = 1.192*((F/Pd)*(Y_g)^(1/2))^(0.0535);  % Size factor for gear
   
-  % Load Distribution Factor
+%% Load Distribution Factors
   
-  Kc = ;    % load correction factor--- uncrowned = 1, crowned = 0.8
+  Cc = ;    % load correction factor--- uncrowned = 1, crowned = 0.8
   
-  % Pinion Proportion Factor
-  %%%
-  %%%
-  %%%
+  % Pinion Proportion Factor and Modifier
+  if F <= 1
+    Cf_p = ((F/(10*d_p))-0.025);
+  elseif (1<F)&&(F<=17)
+    Cf_p = ((F/(10*d_p))-0.0375+0.0125*F);
+  elseif (17<F)&&(F<=40)
+    Kf_p = ((F/(10*d_p))-0.1109+0.0207*F-0.000228*(F)^(2));
+  end
+  
+  s_ratio = s1/s2;
+  if (s_ratio) < 0.175
+    Cm_p = 1;
+  else
+    Cm_p = 1.1;
+  end
+  
+  % Mesh Alignment Factor and Correction Factor
+  Ce = ; % 0.8 if gear is adjusted, 1 for all other conditions
+  Cma = 0.127 + 0.0158*F - (0.93*(10)^(-4))*F^(2); % Equation for commercial application
+    % please change numbers above if you intend to use more precise gearing
+  
+  % Load Distribution Km
+  Km = 1 + (Cc*((Cf_p*Cm_p)+(Cma*Ce)));
+  
+  % Rim Thickness factor 
+  
+  mb = t/(ade+ded);
+  
+  if mb < 1.2
+    Kb = 1.6*(log(2.242/m_b));
+  else
+    Kb = 1
+  end
+
+  % Elastic Coefficient
+  Cp = (1/((pi*(((1-nu_p^2)/E_p) + ((1-nu^2)/E)))))^(1/2);
+    
+  mg = N/N_p; % speed ratio
+  
+  % Reliability Factor
+  if (R>0.5)&&(R<0.99)
+    Kr = 0.658 - 0.0759*log(1-R);
+  else
+    Kr = 0.50 - 0.109*log(1-R);
+  end
+  
+  % Bending Strength
+  % Please note this is dependent on Brinell Hardness Criteria
+    if mat = 1
+      St = (77.3*Hb)+(12800);
+    elseif mat = 2
+      St = (102*Hb)+(16400);
+    else
+      error('invalid material selection')
+    end
+    
+  % Contact Strength
+  % Please note this is dependent on Brinell Hardness Criteria
+    if mat = 1
+      Sc = (322*H_b)+(29100);    
+    elseif mat = 2
+      Sc = (349*H_b)+(34300);
+    else
+      error('invalid material selection')
+    end
+   
+  
+  
+  
+  
+  
