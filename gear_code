@@ -22,7 +22,8 @@
 
 % Gear Material
   % this is to be predetermined; any edits to material require code to be changed.
-  nu = ;        % poisson's ratio
+  nu = ;        % poisson's ratio (gear)
+  nu_p = nu;      % poisson's ratio (pinion), assume same material
   E = ;         % elastic modulus (ksi)
   density = ;   % density (lb/ft^3)
   mat = ;       % set this to either 1 or 2.
