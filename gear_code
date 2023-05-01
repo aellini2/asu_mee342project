@@ -43,6 +43,8 @@
   N = ;         % Number of teeth on gear
   N_p = ;       % Number of teeth on pinion
   rf = ;        % fillet radius (inches)
+  
+  mg = N/N_p; % speed ratio
 
 % Pinion Geometry
   s1 = ;        % distance between midway and gear
@@ -262,9 +264,7 @@ end
 
   % Elastic Coefficient
   Cp = (1/((pi*(((1-nu_p^2)/E_p) + ((1-nu^2)/E)))))^(1/2);
-    
-  mg = N/N_p; % speed ratio
-  
+      
   % Reliability Factor
   if (R>0.5)&&(R<0.99)
     Kr = 0.658 - 0.0759*log(1-R);
