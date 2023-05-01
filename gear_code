@@ -51,8 +51,8 @@
   s2 = ;        % total distance between centerline of bearing (See Shigley for figure)
 
 % Geometry Factors
-  J = ;          % see Shigley table 14-6
-  J_p = ;        % see Shigley table 14-6
+  J = ;          % see Shigley figure 14-6
+  J_p = ;        % see Shigley figure 14-6
   I = ((cosd(phi)*sind(phi))/(2))*(mg/(mg+1)); % Geometry Factor
  
 % Brinell Hardness
