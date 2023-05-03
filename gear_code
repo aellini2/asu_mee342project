@@ -17,7 +17,7 @@
 % Diametral Pitch and Face Width
   % face width must be between 3pi/Pd and 5pi/Pd
   % recommended F of 4pi/Pd used below.
-  Pd = ;              % diametral pitch
+  Pd = ;              % diametral pitch in inches
   F = 4*pi/Pd;        % net face width (narrowest member)
 
 % Gear Material
@@ -25,9 +25,9 @@
   nu = ;        % poisson's ratio (gear)
   nu_p = nu;      % poisson's ratio (pinion), assume same material
   E = ;         % elastic modulus gear (ksi)
-  E_p = ;         % elastic modulus pinion (ksi)
+  E_p = E;         % elastic modulus pinion (ksi)
   density = ;   % density gear (lb/ft^3)
-  density_p = ;   % density pinion (lb/ft^3)
+  density_p = density;   % density pinion (lb/ft^3)
 
   mat = ;       % set this to either 1 or 2.
     % 1 = grade 1 through-hardened steel, 2 = grade 2 hardened steel
@@ -69,7 +69,7 @@
   Ch = Hb_p/Hb_g;
     if Ch < 1
       error('invalid brinell hardness')
-    ifelse Ch > 1.7
+    elseif Ch > 1.7
       error('invalid brinell hardness')
     end
   Ch = 1;         % delete this line if gears are different materials
@@ -228,7 +228,7 @@ end
   
   % Load Distribution Factors
   
-  Cc = ;    % load correction factor--- uncrowned = 1, crowned = 0.8
+  Cc = 1;    % load correction factor--- uncrowned = 1, crowned = 0.8
   
   % Proportion Factor and Modifier
     Cf = 1;         % assumed Surface Condition Factor of gear
@@ -249,7 +249,7 @@ end
   end
   
   % Mesh Alignment Factor and Correction Factor
-  Ce = ; % 0.8 if gear is adjusted, 1 for all other conditions
+  Ce = 1; % 0.8 if gear is adjusted, 1 for all other conditions
   Cma = 0.127 + 0.0158*F - (0.93*(10)^(-4))*F^(2); % Equation for commercial application
     % please change numbers above if you intend to use more precise gearing
   
@@ -263,7 +263,7 @@ end
   if mb < 1.2
     Kb = 1.6*(log(2.242/m_b));
   else
-    Kb = 1
+    Kb = 1;
   end
 
   % Elastic Coefficient
@@ -278,9 +278,9 @@ end
   
   % Bending Strength
   % Please note this is dependent on Brinell Hardness Criteria
-    if mat = 1
+    if mat == 1
       St = (77.3*Hb)+(12800);
-    elseif mat = 2
+    elseif mat == 2
       St = (102*Hb)+(16400);
     else
       error('invalid material selection')
@@ -288,9 +288,9 @@ end
     
   % Contact Strength
   % Please note this is dependent on Brinell Hardness Criteria
-    if mat = 1
+    if mat == 1
       Sc = (322*H_b)+(29100);    
-    elseif mat = 2
+    elseif mat == 2
       Sc = (349*H_b)+(34300);
     else
       error('invalid material selection')
@@ -309,33 +309,42 @@ end
 
 % Gear (Larger)
 
-bendStressG = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J)   % bending stress
+bendStressG = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J);   % bending stress
 contStressG = (Cp)*((Wt)*(Ko)*(Kv)*(Ks)*((Km)*(Cf))/((dp)*(F)*(I))); % contact stress
 
-bendFS = ((St*Yn)/(Kt*Kr))/bendStressG       % bending factor of safety
+bendFS = ((St*Yn)/(Kt*Kr))/bendStressG ;       % bending factor of safety
 contFS = (Sc*Zn*Ch)/(Kt*Kr*contStressG);     % contact factor of safety (wear)
 
-bendFatigue = (St*Yn)/(bendFS*Kt*Kr)             % bending fatigue/endurance strength
-contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)              % contact fatigue/endurance strength (wear)
+bendFatigueG = (St*Yn)/(bendFS*Kt*Kr);             % bending fatigue/endurance strength
+contFatigueG = (Sc*Zn*Ch)/(Sh*Kt*Kr);              % contact fatigue/endurance strength (wear)
 
 weightG = density*Vol_g;
 
 % Pinion (Smaller)
 
-bendStressP = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J_p)  % bending stress
+bendStressP = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J_p);  % bending stress
 contStressP = (Cp)*((Wt)*(Ko)*(Kv)*(Ks_p)*((Km)*(Cf_p))/((dp)*(F)*(I)));   % contact stress
 
-bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressG             % bending factor of safety
+bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressG ;            % bending factor of safety
 contFS_p = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*contStressP); % contact factor of safety (wear)
 
-bendFatigue = (St*Yn)/(Sf*Kt*Kr)                % bending fatigue/endurance strength
-contFatigue = (Sc*Zn*Ch)/(Sh*Kt*Kr)             % contact fatigue/endurance strength (wear)
+bendFatigueP = (St*Yn)/(Sf*Kt*Kr);                % bending fatigue/endurance strength
+contFatigueP = (Sc*Zn*Ch)/(Sh*Kt*Kr);             % contact fatigue/endurance strength (wear)
 
 weightP = density*Vol_p;
 
 % Print Results
     disp('Gear Bending FS:', bendFS)
+    disp('Gear Bending Fatigue FS:', bendFatigueG)
+
     disp('Gear Contact FS:', contFS)
+    disp('Gear Contact Fatigue FS:', contFatigueG)
+
     disp('Pinion Bending FS:', bendFS_p)
+    disp('Gear Bending Fatigue FS:', bendFatigueP)
+
     disp('Pinion Cont FS:', contFS_p)
+    disp('Gear Bending Fatigue FS:', contFatigueP)
+
+
    
