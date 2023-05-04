@@ -17,46 +17,49 @@
 % Diametral Pitch and Face Width
   % face width must be between 3pi/Pd and 5pi/Pd
   % recommended F of 4pi/Pd used below.
-  Pd = ;              % diametral pitch in inches
+  Pd = 3.75;              % diametral pitch in teeth/inches
+  Pd_p = 4;               % diametral pitch pinion
   F = 4*pi/Pd;        % net face width (narrowest member)
 
 % Gear Material
   % this is to be predetermined; any edits to material require code to be changed.
-  nu = ;        % poisson's ratio (gear)
+  nu = 0.290;        % poisson's ratio (gear)
   nu_p = nu;      % poisson's ratio (pinion), assume same material
-  E = ;         % elastic modulus gear (ksi)
+  E = 29000;         % elastic modulus gear (ksi)
   E_p = E;         % elastic modulus pinion (ksi)
-  density = ;   % density gear (lb/ft^3)
+  density = 0.284*(12^3);   % density gear (lb/ft^3)
   density_p = density;   % density pinion (lb/ft^3)
 
-  mat = ;       % set this to either 1 or 2.
+  mat = 1;       % set this to either 1 or 2.
     % 1 = grade 1 through-hardened steel, 2 = grade 2 hardened steel
     % if a different material is chosen, must change Brinell Hardness eqn and Strength eqns
 % Loads and Forces
-  rpm = ;       % revolutions per minute
-  H = ;         % power (hp)
+  rpm = 200;       % revolutions per minute
+  T = 115.8*12;       % torque lb*in
+  H = (T*rpm)/63025 ; % power (hp)
   R = 0.9;      % reliability factor (est 0.9)
-  Ko = ;        % overload factor, obtain from Shigley Tables
+  Ko = 1.5;     % overload factor, obtain from Shigley Tables
+                % between 1 (uniform) and 2.25 (heavy shock)
 
 % Quality
-  qual = ;      % quality number (1-6, with 6 being the highest)
-  nd = ;        % design factor
+  qual = 4;      % quality number (1-6, with 6 being the highest)
+  % nd = ;        % design factor, omitted
   
 % Teeth Systems
-  phi = ;       % pressure angle, see shigley for derivation
-  N = ;         % Number of teeth on gear
-  N_p = ;       % Number of teeth on pinion
-  rf = ;        % fillet radius (inches)
+  phi = 20;       % pressure angle, see shigley for derivation
+  N = 60;         % Number of teeth on gear
+  N_p = 15;       % Number of teeth on pinion
+  rf = 0.125;        % fillet radius (inches)
   
   mg = N/N_p; % speed ratio
 
 % Pinion Geometry
-  s1 = ;        % distance between midway and gear
-  s2 = ;        % total distance between centerline of bearing (See Shigley for figure)
+  s1 = 1;        % distance between midway and gear
+  s2 = 8;        % total distance between centerline of bearings (See Shigley figure 14-10)
 
 % Geometry Factors
-  J = ;          % see Shigley figure 14-6
-  J_p = ;        % see Shigley figure 14-6
+  J = 0.40;          % see Shigley figure 14-6
+  J_p = 0.25;        % see Shigley figure 14-6
   I = ((cosd(phi)*sind(phi))/(2))*(mg/(mg+1)); % Geometry Factor
  
 % Brinell Hardness
@@ -64,8 +67,8 @@
   % for a summary, Ch = 1 for pinion ALWAYS.  
     % first find Hb (gear) and Hb_p (pinion), next refer to ratio on table or eqn on previous page.
     % Ratio Hbp/Hbg = Ch. Please ensure pinion is harder than
-  Hb_p ;          % enter pinion hardness
-  Hb_g ;          % enter gear hardness
+  Hb = 163;          % enter gear hardness
+  Hb_p = Hb;          % enter pinion hardness
   Ch = Hb_p/Hb_g;
     if Ch < 1
       error('invalid brinell hardness')
@@ -90,14 +93,14 @@
 % Factors and Such
   
   % Dynamic Factor Pinion
-  V = pi*d_p*N_p/12;  % pitch line velocity
+  V = pi*dp*N_p/12;  % pitch line velocity
   B = 0.25*(12-qual)^(2/3);
   A = 50+56*(1-B);
-  Kv = ((A+(V_t)^(1/2))/A)^(B);  % dynamic factor
+  Kv = ((A+(V)^(1/2))/A)^(B);  % dynamic factor
   
   % Size Factor
-  ade = 1/P_d;        % addendum
-  ded = 1.25/P_d;    % dedendum 
+  ade = 1/Pd;        % addendum
+  ded = 1.25/Pd;    % dedendum 
   t = 1.2*(ade+ded); % assuming m_b to be 1.2
   l = (ade + ded); % height of tooth  
   
@@ -234,11 +237,11 @@ end
     Cf = 1;         % assumed Surface Condition Factor of gear
     
   if F <= 1
-    Cf_p = ((F/(10*d_p))-0.025);
+    Cf_p = ((F/(10*dp))-0.025);
   elseif (1<F)&&(F<=17)
-    Cf_p = ((F/(10*d_p))-0.0375+0.0125*F);
+    Cf_p = ((F/(10*dp))-0.0375+0.0125*F);
   elseif (17<F)&&(F<=40)
-    Kf_p = ((F/(10*d_p))-0.1109+0.0207*F-0.000228*(F)^(2));
+    Kf_p = ((F/(10*dp))-0.1109+0.0207*F-0.000228*(F)^(2));
   end
   
   s_ratio = s1/s2;
@@ -255,7 +258,10 @@ end
   
   % Load Distribution Km
   Km = 1 + (Cc*((Cf_p*Cm_p)+(Cma*Ce)));
-  
+
+  % Temperature Factor Kt
+  Kt = 1;       % assume system remains below 250 degrees F
+
   % Rim Thickness factor 
   
   mb = t/(ade+ded);
@@ -289,21 +295,21 @@ end
   % Contact Strength
   % Please note this is dependent on Brinell Hardness Criteria
     if mat == 1
-      Sc = (322*H_b)+(29100);    
+      Sc = (322*H)+(29100);    
     elseif mat == 2
-      Sc = (349*H_b)+(34300);
+      Sc = (349*H)+(34300);
     else
       error('invalid material selection')
     end
    
   % Cycle Factors
-  Ncycles = H*(60)*(24)*(365)*(10);
+  Ncycles = rpm*(60)*(24)*(365)*(10);
   
     % Stress Factor (bending)
-  Yn = 1.3558*Num_Cycles^(-0.0178);
+  Yn = 1.3558*Ncycles^(-0.0178);
   
     % Stress Factor (pitting)
-  Zn = 1.4488*Num_Cycles^(-0.0178);
+  Zn = 1.4488*Ncycles^(-0.023);
   
 %% Governing Equations
 
@@ -313,38 +319,38 @@ bendStressG = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J);   % bending stress
 contStressG = (Cp)*((Wt)*(Ko)*(Kv)*(Ks)*((Km)*(Cf))/((dp)*(F)*(I))); % contact stress
 
 bendFS = ((St*Yn)/(Kt*Kr))/bendStressG ;       % bending factor of safety
-contFS = (Sc*Zn*Ch)/(Kt*Kr*contStressG);     % contact factor of safety (wear)
+contFS = (Sc*Zn*Ch)/(Kt*Kr*contStressG);       % contact factor of safety (wear)
 
 bendFatigueG = (St*Yn)/(bendFS*Kt*Kr);             % bending fatigue/endurance strength
-contFatigueG = (Sc*Zn*Ch)/(Sh*Kt*Kr);              % contact fatigue/endurance strength (wear)
+contFatigueG = (Sc*Zn*Ch)/(contFS*Kt*Kr);              % contact fatigue/endurance strength (wear)
 
-weightG = density*Vol_g;
+weightG = density*vol_g;
 
 % Pinion (Smaller)
 
-bendStressP = Wt*Ko*Kv*Ks*(Pd/F)*(Km*Kb/J_p);  % bending stress
+bendStressP = Wt*Ko*Kv*Ks*(Pd_p/F)*(Km*Kb/J_p);  % bending stress
 contStressP = (Cp)*((Wt)*(Ko)*(Kv)*(Ks_p)*((Km)*(Cf_p))/((dp)*(F)*(I)));   % contact stress
 
-bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressG ;            % bending factor of safety
+bendFS_p = ((St*Yn)/(Kt*Kr))/bendStressP ;            % bending factor of safety
 contFS_p = ((Sc)*(Zn)*(Ch))/((Kt)*(Kr)*contStressP); % contact factor of safety (wear)
 
-bendFatigueP = (St*Yn)/(Sf*Kt*Kr);                % bending fatigue/endurance strength
-contFatigueP = (Sc*Zn*Ch)/(Sh*Kt*Kr);             % contact fatigue/endurance strength (wear)
+bendFatigueP = (St*Yn)/(bendFS_p*Kt*Kr);                % bending fatigue/endurance strength
+contFatigueP = (Sc*Zn*Ch)/(contFS_p*Kt*Kr);             % contact fatigue/endurance strength (wear)
 
-weightP = density*Vol_p;
+weightP = density*vol_p;
 
 % Print Results
-    disp('Gear Bending FS:', bendFS)
-    disp('Gear Bending Fatigue FS:', bendFatigueG)
+    fprintf('Gear Bending FS: %f   ;   ', bendFS);
+    fprintf('Gear Bending Fatigue FS: %f', bendFatigueG); disp(' ')
 
-    disp('Gear Contact FS:', contFS)
-    disp('Gear Contact Fatigue FS:', contFatigueG)
+    fprintf('Gear Contact FS: %f   ;   ', contFS);
+    fprintf('Gear Contact Fatigue FS: %f', contFatigueG); disp(' ')
 
-    disp('Pinion Bending FS:', bendFS_p)
-    disp('Gear Bending Fatigue FS:', bendFatigueP)
+    fprintf('Pinion Bending FS: %f   ;   ', bendFS_p);
+    fprintf('Gear Bending Fatigue FS: %f', bendFatigueP); disp(' ')
 
-    disp('Pinion Cont FS:', contFS_p)
-    disp('Gear Bending Fatigue FS:', contFatigueP)
+    fprintf('Pinion Cont FS: %f   ;   ', contFS_p);
+    fprintf('Gear Bending Fatigue FS: %f', contFatigueP); disp(' ')
 
 
    
